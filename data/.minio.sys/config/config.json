@@ -172,8 +172,8 @@
 		},
 		"webhook": {
 			"1": {
-				"enable": false,
-				"endpoint": "",
+				"enable": true,
+				"endpoint": "http://gateway:8080/function/allfiles/",
 				"queueDir": "",
 				"queueLimit": 0
 			}
