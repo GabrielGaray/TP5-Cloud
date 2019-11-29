@@ -1,0 +1,10 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:8080
+functions:
+  get-file:
+    lang: node10-express
+    handler: ./get-file
+    image: zenack/get-file:latest
+
