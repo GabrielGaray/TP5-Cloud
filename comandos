@@ -1,0 +1,42 @@
+docker network create --driver bridge func_functions
+docker rm -f minio; docker run -dit -p 9000:9000 \
+  -e MINIO_ACCESS_KEY=minio -e MINIO_SECRET_KEY=minio123 \
+  --hostname minio \
+  --name minio \
+  --network func_functions \
+  -v "/home/zenack/Cloud Computing/TP5/TP5-Cloud/data":/data \
+  minio/minio server /data
+
+docker inspect func_functions | grep -i "name\|subnet\|gateway\|ipv4"
+docker network connect func_functions minio
+
+docker run --rm -it --network func_functions --entrypoint=/bin/sh minio/mc
+mc config host add minio http://minio:9000 minio minio123
+
+"1": {
+				"enable": true,
+				"endpoint": "http://gateway:8080/function/figlet/",
+				"queueDir": "",
+				"queueLimit": 0
+			}
+
+mc event add minio/tp5 arn:minio:sqs::1:webhook --event put
+mc event add minio/tp5 arn:minio:sqs::1:webhook --event put --suffix .jpg,.png
+mc event list minio/tp5
+
+faas template store pull node10-express
+faas new --lang node10-express new-file --prefix=chetinchog
+faas up -f new-file.yml
+faas logs new-file
+
+docker rm -f func_mdb; docker run -di --name func_mdb --hostname func_mdb --network func_functions -p 27017:27017 -v /data/db:/data/db --cap-add NET_ADMIN mongo
+
+faas remove new-file; faas up -f new-file.yml && faas logs new-file
+faas remove width-heigth; faas up -f width-heigth.yml && faas logs width-heigth
+faas remove info-exif; faas up -f info-exif.yml && faas logs info-exif
+faas remove pdf-data; faas up -f pdf-data.yml && faas logs pdf-data
+faas remove pdf-text; faas up -f pdf-text.yml && faas logs pdf-text
+faas remove txt-text; faas up -f txt-text.yml && faas logs txt-text
+
+faas remove file; faas up -f file.yml && faas logs file
+faas remove image; faas up -f image.yml && faas logs image

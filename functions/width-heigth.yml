@@ -1,0 +1,10 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:8080
+functions:
+  width-heigth:
+    lang: node10-express
+    handler: ./width-heigth
+    image: zenack/width-heigth:latest
+
